@@ -7,13 +7,60 @@
   </head>
 
   <body>
-    <form id="form">
-      <label>Image</label>
-      <input type="text" id="image" />
-    </form>
-
+    <div id="container">
+      <div>
+        <label>URL</label>
+        <input type="text" id="url" />
+      </div>
+      <div>
+        <label>Image</label>
+        <input type="text" id="image" />
+      </div>
+      <div>
+        <label>Description</label>
+        <input type="text" id="description" />
+      </div>
+      <div>
+        <input type="button" value="Create" id="submit" />
+      </div>
+    </div>
     <script>
-      window.location.replace("{{url}}");
+      document.addEventListener("DOMContentLoaded", () => {
+        const containerElem = document.getElementById("container");
+        const urlElem = document.getElementById("url");
+        const imageElem = document.getElementById("image");
+        const descriptionElem = document.getElementById("description");
+        const submitElem = document.getElementById("submit");
+        submitElem.onclick = () => {
+          const url = urlElem.value;
+          const image = imageElem.value.length === 0 ? undefined : imageElem.value;
+          const description =
+            descriptionElem.value.length === 0 ? undefined : descriptionElem.value;
+          const payload = {
+            url,
+            image,
+            description
+          };
+          window
+            .fetch("/", {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(payload)
+            })
+            .then(results => results.json())
+            .then(results => {
+              const path = results.url;
+              const redirecPath = `${window.location.origin}/${path}`;
+              const newElem = document.createElement("div");
+              newElem.innerText = `The decorated URL is: ${redirecPath}`;
+              containerElem.remove();
+              document.body.appendChild(newElem);
+            });
+        };
+      });
     </script>
   </body>
 </html>
